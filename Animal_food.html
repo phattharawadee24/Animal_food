@@ -1,0 +1,2091 @@
+<!DOCTYPE html>
+<html lang="th" data-vibe="pop">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>PAW LABZ 🐾 ระบบคลังและจัดการอาหารสัตว์</title>
+
+  <!-- Google Fonts: ฟอนต์ภาษาไทย Prompt และ Noto Sans Thai สวยงาม อ่านง่าย สบายตา -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700&family=Prompt:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* ===================================================
+       1. ตัวแปรสีและธีม (CSS Custom Properties & Themes)
+       =================================================== */
+    :root, [data-vibe="pop"] {
+      --bg: #fdfbf7;
+      --bg-dot: #e5e0d5;
+      --card: #ffffff;
+      --ink: #16161a;
+      --mute: #6b6b7b;
+      --line: #16161a;
+      --soft-line: #e4e2dd;
+      --primary: #ff5c8a;
+      --primary-ink: #ffffff;
+      --lime: #c8f904;
+      --purple: #8b5cf6;
+      --cyan: #00e5ff;
+      --gold: #ffbe0b;
+      --red: #ff3355;
+      --teal: #00d68f;
+      --pill-ok: #d8f8e8;
+      --pill-ok-ink: #046c4e;
+      --pill-wait: #fff3c4;
+      --pill-wait-ink: #92400e;
+      --pill-no: #ffe0e6;
+      --pill-no-ink: #b91c1c;
+      --side: #16161a;
+      --side-card: #24242c;
+      --side-ink: #f4f4f6;
+      --shadow: 4px 4px 0px #16161a;
+      --shadow-sm: 2px 2px 0px #16161a;
+      --shadow-lg: 6px 6px 0px #16161a;
+      --bw: 2px;
+    }
+
+    [data-vibe="cyber"] {
+      --bg: #0b0c10;
+      --bg-dot: #1f2230;
+      --card: #141622;
+      --ink: #f4f6ff;
+      --mute: #949ab1;
+      --line: #383e56;
+      --soft-line: #232738;
+      --primary: #b8ff01;
+      --primary-ink: #0b0c10;
+      --lime: #00f5d4;
+      --purple: #a855f7;
+      --cyan: #38bdf8;
+      --gold: #facc15;
+      --red: #ff4d6d;
+      --teal: #00f5d4;
+      --pill-ok: #083b33;
+      --pill-ok-ink: #5eead4;
+      --pill-wait: #423006;
+      --pill-wait-ink: #fde047;
+      --pill-no: #4c1120;
+      --pill-no-ink: #fda4af;
+      --side: #07080c;
+      --side-card: #141622;
+      --side-ink: #e2e8f0;
+      --shadow: 4px 4px 0px #b8ff01;
+      --shadow-sm: 2px 2px 0px #383e56;
+      --shadow-lg: 6px 6px 0px #a855f7;
+      --bw: 2px;
+    }
+
+    [data-vibe="coquette"] {
+      --bg: #fff5f8;
+      --bg-dot: #f9d8e4;
+      --card: #ffffff;
+      --ink: #4a152b;
+      --mute: #965670;
+      --line: #4a152b;
+      --soft-line: #f6dae4;
+      --primary: #ff477e;
+      --primary-ink: #ffffff;
+      --lime: #ffc2d1;
+      --purple: #c77dff;
+      --cyan: #a2d2ff;
+      --gold: #ffca3a;
+      --red: #ff1e56;
+      --teal: #38b000;
+      --pill-ok: #e0f8e9;
+      --pill-ok-ink: #1b6d39;
+      --pill-wait: #fff0c2;
+      --pill-wait-ink: #8f5b00;
+      --pill-no: #ffd6e0;
+      --pill-no-ink: #a4133c;
+      --side: #3b0d22;
+      --side-card: #591836;
+      --side-ink: #ffe5ec;
+      --shadow: 4px 4px 0px #ff85a1;
+      --shadow-sm: 2px 2px 0px #ff85a1;
+      --shadow-lg: 6px 6px 0px #4a152b;
+      --bw: 2px;
+    }
+
+    /* ===================================================
+       2. สไตล์พื้นฐานของหน้าเว็บ (Base Layout & Typography)
+       =================================================== */
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+    }
+
+    body {
+      font-family: 'Noto Sans Thai', 'Prompt', system-ui, sans-serif;
+      background-color: var(--bg);
+      background-image: radial-gradient(var(--bg-dot) 1.5px, transparent 1.5px);
+      background-size: 20px 20px;
+      color: var(--ink);
+      font-size: 15px;
+      line-height: 1.5;
+      transition: background-color 0.2s ease, color 0.2s ease;
+    }
+
+    h1, h2, h3, .num, .font-head {
+      font-family: 'Prompt', 'Noto Sans Thai', system-ui, sans-serif;
+      margin: 0;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+
+    button, input, select {
+      font: inherit;
+      color: inherit;
+    }
+
+    /* แถบหัวข้อแจ้งเตือนด้านบน (Top Ticker Bar) */
+    .ticker {
+      background: var(--lime);
+      color: #16161a;
+      border-bottom: var(--bw) solid var(--line);
+      font-family: 'Prompt', sans-serif;
+      font-weight: 700;
+      font-size: 13px;
+      padding: 7px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    .ticker-badges {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .vibe-btn {
+      border: 1.5px solid #16161a;
+      background: #ffffff;
+      color: #16161a;
+      border-radius: 99px;
+      padding: 3px 10px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.12s ease, background 0.12s ease;
+    }
+
+    .vibe-btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .vibe-btn.active {
+      background: #16161a;
+      color: #ffffff;
+    }
+
+    /* โครงสร้างหลักของแอปพลิเคชัน (App Layout) */
+    .app {
+      display: flex;
+      min-height: calc(100vh - 38px);
+    }
+
+    /* ===================================================
+       3. แถบเมนูด้านข้าง (Sidebar Navigation)
+       =================================================== */
+    aside {
+      width: 270px;
+      background: var(--side);
+      color: var(--side-ink);
+      border-right: var(--bw) solid var(--line);
+      padding: 22px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      flex-shrink: 0;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 6px 8px 14px;
+      border-bottom: 1px dashed rgba(255, 255, 255, 0.18);
+    }
+
+    .logo {
+      width: 46px;
+      height: 46px;
+      border-radius: 14px;
+      background: var(--lime);
+      color: #16161a;
+      border: 2px solid #ffffff;
+      display: grid;
+      place-items: center;
+      font-size: 24px;
+      box-shadow: 3px 3px 0px var(--primary);
+      transform: rotate(-4deg);
+    }
+
+    .brand b {
+      font-family: 'Prompt', sans-serif;
+      font-size: 19px;
+      color: #ffffff;
+      letter-spacing: -0.02em;
+    }
+
+    .brand small {
+      display: inline-block;
+      background: var(--primary);
+      color: var(--primary-ink);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 1px 8px;
+      border-radius: 99px;
+      margin-top: 2px;
+    }
+
+    /* กล่องสลับบทบาทผู้ใช้งาน (Role / POV Switcher) */
+    .who {
+      background: var(--side-card);
+      border: 1.5px solid rgba(255, 255, 255, 0.16);
+      border-radius: 16px;
+      padding: 12px;
+      font-size: 12px;
+    }
+
+    .who label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 600;
+      color: #cbd5e1;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .who select {
+      width: 100%;
+      margin-top: 6px;
+      padding: 9px 12px;
+      border-radius: 12px;
+      border: 2px solid var(--lime);
+      background: #0f111a;
+      color: #ffffff;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* เมนูนำทาง (Navigation Buttons) */
+    nav {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    nav button {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: transparent;
+      border: 2px solid transparent;
+      color: var(--side-ink);
+      padding: 11px 14px;
+      border-radius: 14px;
+      cursor: pointer;
+      text-align: left;
+      font-weight: 600;
+      transition: all 0.15s ease;
+    }
+
+    nav button:hover {
+      background: var(--side-card);
+      transform: translateX(3px);
+    }
+
+    nav button.on {
+      background: var(--primary);
+      color: var(--primary-ink);
+      border-color: #ffffff;
+      box-shadow: 3px 3px 0px var(--lime);
+    }
+
+    nav .badge {
+      margin-left: auto;
+      background: var(--lime);
+      color: #16161a;
+      border: 1.5px solid #16161a;
+      border-radius: 99px;
+      font-size: 11px;
+      padding: 2px 8px;
+      font-weight: 800;
+    }
+
+    .side-footer {
+      margin-top: auto;
+      background: var(--side-card);
+      border-radius: 14px;
+      padding: 12px;
+      font-size: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      line-height: 1.4;
+    }
+
+    /* ===================================================
+       4. พื้นที่เนื้อหาหลัก (Main Content Area)
+       =================================================== */
+    main {
+      flex: 1;
+      min-width: 0;
+      padding: 28px 34px 70px;
+      max-width: 1240px;
+    }
+
+    .head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-bottom: 22px;
+    }
+
+    .head-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--lime);
+      color: #16161a;
+      border: 1.5px solid var(--line);
+      border-radius: 99px;
+      padding: 3px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 6px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .head h1 {
+      font-size: 28px;
+      line-height: 1.2;
+    }
+
+    .head p {
+      margin: 4px 0 0;
+      color: var(--mute);
+      font-weight: 500;
+    }
+
+    /* กล่องสถิติ Bento Grid (Dashboard Stats) */
+    .grid {
+      display: grid;
+      gap: 16px;
+    }
+
+    .stats {
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      margin-bottom: 24px;
+    }
+
+    .stat {
+      background: var(--card);
+      border: var(--bw) solid var(--line);
+      border-radius: 20px;
+      padding: 18px 20px;
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .stat:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .stat .sticker {
+      position: absolute;
+      right: 14px;
+      top: 14px;
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      border: 2px solid var(--line);
+      display: grid;
+      place-items: center;
+      font-size: 20px;
+      background: var(--lime);
+      color: #16161a;
+      transform: rotate(6deg);
+    }
+
+    .stat.b .sticker { background: var(--cyan); transform: rotate(-6deg); }
+    .stat.r .sticker { background: #ffccd5; transform: rotate(8deg); }
+    .stat.g .sticker { background: var(--gold); transform: rotate(-4deg); }
+
+    .stat small {
+      color: var(--mute);
+      font-weight: 600;
+      font-size: 13px;
+      display: block;
+    }
+
+    .stat .num {
+      font-size: 34px;
+      display: block;
+      line-height: 1.15;
+      margin-top: 6px;
+    }
+
+    .stat .sub {
+      font-size: 12px;
+      font-weight: 600;
+      margin-top: 6px;
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 99px;
+      background: var(--soft-line);
+    }
+
+    /* การ์ดและกล่องข้อมูล (Cards) */
+    .card {
+      background: var(--card);
+      border: var(--bw) solid var(--line);
+      border-radius: 22px;
+      padding: 20px 22px;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    .card-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+
+    .card h2 {
+      font-size: 19px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* ตารางแสดงข้อมูล (Data Tables) */
+    .wrap {
+      overflow-x: auto;
+    }
+
+    .tbl {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .tbl th {
+      text-align: left;
+      font-weight: 700;
+      color: var(--mute);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      padding: 10px 12px;
+      border-bottom: 2px solid var(--line);
+      white-space: nowrap;
+    }
+
+    .tbl td {
+      padding: 12px;
+      border-bottom: 1px solid var(--soft-line);
+      vertical-align: middle;
+    }
+
+    .tbl tr:hover td {
+      background: rgba(139, 92, 246, 0.04);
+    }
+
+    .tbl tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .r- {
+      text-align: right;
+    }
+
+    .item-cell {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .item-ico {
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      border: 1.5px solid var(--line);
+      background: var(--bg);
+      display: grid;
+      place-items: center;
+      font-size: 19px;
+      flex-shrink: 0;
+    }
+
+    /* ป้ายสถานะ (Status Pills) */
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 12px;
+      border-radius: 99px;
+      font-size: 12px;
+      font-weight: 700;
+      border: 1.5px solid var(--line);
+      white-space: nowrap;
+      box-shadow: 1.5px 1.5px 0px var(--line);
+    }
+
+    .p-ok   { background: var(--pill-ok); color: var(--pill-ok-ink); }
+    .p-wait { background: var(--pill-wait); color: var(--pill-wait-ink); }
+    .p-no   { background: var(--pill-no); color: var(--pill-no-ink); }
+
+    /* ปุ่มกด (Action Buttons) */
+    .btn {
+      border: var(--bw) solid var(--line);
+      border-radius: 14px;
+      padding: 10px 18px;
+      cursor: pointer;
+      font-weight: 700;
+      background: var(--primary);
+      color: var(--primary-ink);
+      box-shadow: var(--shadow-sm);
+      transition: transform 0.12s ease, box-shadow 0.12s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: var(--shadow);
+    }
+
+    .btn:active {
+      transform: translate(1px, 1px);
+      box-shadow: none;
+    }
+
+    .btn.s    { padding: 6px 13px; font-size: 13px; border-radius: 11px; }
+    .btn.o    { background: var(--card); color: var(--ink); }
+    .btn.d    { background: var(--red); color: #ffffff; }
+    .btn.gold { background: var(--lime); color: #16161a; }
+
+    /* กล่องข้อความและตัวกรอง (Inputs & Chips) */
+    input[type=text],
+    input[type=number],
+    input[type=search],
+    select.f {
+      padding: 10px 14px;
+      border-radius: 14px;
+      border: var(--bw) solid var(--line);
+      background: var(--bg);
+      color: var(--ink);
+      width: 100%;
+      font-weight: 500;
+    }
+
+    input[type=number] {
+      width: 96px;
+      text-align: right;
+      font-weight: 700;
+    }
+
+    input:focus,
+    select:focus {
+      outline: 3px solid var(--primary);
+      outline-offset: 1px;
+    }
+
+    .tools {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+      align-items: center;
+    }
+
+    .chip-bar {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+
+    .chip {
+      border: 1.5px solid var(--line);
+      background: var(--bg);
+      color: var(--ink);
+      border-radius: 99px;
+      padding: 6px 14px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.12s ease;
+    }
+
+    .chip:hover {
+      transform: translateY(-1px);
+    }
+
+    .chip.on {
+      background: var(--lime);
+      color: #16161a;
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* แถบระดับสต็อก (Stock Level Bar) */
+    .bar {
+      height: 12px;
+      border-radius: 99px;
+      background: var(--soft-line);
+      border: 1.5px solid var(--line);
+      overflow: hidden;
+      min-width: 90px;
+    }
+
+    .bar i {
+      display: block;
+      height: 100%;
+      background: var(--teal);
+      transition: width 0.3s ease;
+    }
+
+    .bar.low i {
+      background: var(--red);
+    }
+
+    .cat {
+      font-family: 'Prompt', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      padding: 10px 12px !important;
+      background: var(--soft-line);
+      border-radius: 10px;
+    }
+
+    /* เวิร์กโฟลว์แนะนำขั้นตอน (Flow Guide) */
+    .flow {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .flow b {
+      background: var(--bg);
+      border: 1.5px solid var(--line);
+      padding: 6px 12px;
+      border-radius: 12px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* กล่องป็อปอัป (Modal Dialog) */
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(10, 12, 20, 0.65);
+      backdrop-filter: blur(4px);
+      display: grid;
+      place-items: center;
+      padding: 16px;
+      z-index: 50;
+    }
+
+    .box {
+      background: var(--card);
+      border: 3px solid var(--line);
+      border-radius: 24px;
+      padding: 24px;
+      width: min(580px, 100%);
+      max-height: 88vh;
+      overflow: auto;
+      box-shadow: 8px 8px 0px var(--primary);
+      animation: pop 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    @keyframes pop {
+      from {
+        transform: scale(0.92) translateY(8px);
+        opacity: 0;
+      }
+      to {
+        transform: scale(1) translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .row {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      margin-top: 18px;
+      flex-wrap: wrap;
+    }
+
+    /* การแจ้งเตือน Toast Message */
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 26px;
+      transform: translateX(-50%);
+      background: #16161a;
+      color: #ffffff;
+      border: 2px solid var(--lime);
+      padding: 12px 22px;
+      border-radius: 99px;
+      font-weight: 700;
+      z-index: 99;
+      box-shadow: 4px 4px 0px var(--primary);
+      animation: pop 0.2s ease;
+    }
+
+    .empty {
+      text-align: center;
+      color: var(--mute);
+      padding: 34px 12px;
+      font-weight: 600;
+      font-size: 16px;
+    }
+
+    .low {
+      color: var(--red);
+      font-weight: 800;
+    }
+
+    /* อนิเมชันกระดาษสายรุ้ง (Confetti Effect) */
+    .confetti {
+      position: fixed;
+      pointer-events: none;
+      z-index: 120;
+      font-size: 22px;
+      animation: fly 1s ease-out forwards;
+    }
+
+    @keyframes fly {
+      0% {
+        transform: translate(0, 0) scale(1) rotate(0deg);
+        opacity: 1;
+      }
+      100% {
+        transform: translate(var(--tx), var(--ty)) scale(0.4) rotate(260deg);
+        opacity: 0;
+      }
+    }
+
+    /* ===================================================
+       5. การแสดงผลบนอุปกรณ์พกพา (Responsive Mobile View)
+       =================================================== */
+    @media (max-width: 860px) {
+      .app {
+        flex-direction: column;
+      }
+
+      aside {
+        width: 100%;
+        height: auto;
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        padding: 12px;
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+
+      .brand {
+        border: 0;
+        padding: 0;
+      }
+
+      .brand span {
+        display: none;
+      }
+
+      .who {
+        flex: 1;
+        padding: 6px 10px;
+      }
+
+      .who label {
+        display: none;
+      }
+
+      .who select {
+        margin: 0;
+      }
+
+      .side-footer {
+        display: none;
+      }
+
+      nav {
+        flex-direction: row;
+        overflow-x: auto;
+        width: 100%;
+        margin-top: 6px;
+      }
+
+      nav button {
+        white-space: nowrap;
+        padding: 8px 12px;
+        font-size: 13px;
+      }
+
+      main {
+        padding: 18px 14px 60px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- แถบแจ้งเตือนด้านบนสุด พร้อมปุ่มสลับธีมสี -->
+  <div class="ticker">
+    <div>⚡ <b>PAW LABZ INVENTORY OS</b> — ระบบคลังอาหารสัตว์ยุคใหม่ สต็อกเป๊ะ เบิกไว ไม่ผิดพลาด 🐾✨</div>
+    <div class="ticker-badges">
+      <span>VIBE:</span>
+      <button class="vibe-btn active" id="vb-pop" onclick="setVibe('pop')">✨ Y2K Pop</button>
+      <button class="vibe-btn" id="vb-coquette" onclick="setVibe('coquette')">🎀 Coquette</button>
+      <button class="vibe-btn" id="vb-cyber" onclick="setVibe('cyber')">👾 Cyber Neon</button>
+    </div>
+  </div>
+
+  <!-- โครงสร้างสองฝั่ง: เมนูด้านข้าง + เนื้อหาหลัก -->
+  <div class="app">
+    <aside>
+      <div class="brand">
+        <div class="logo">🐾</div>
+        <span>
+          <b>PAW LABZ</b><br>
+          <small>ระบบคลัง v2.5 ✨</small>
+        </span>
+      </div>
+
+      <!-- ส่วนจำลองผู้ใช้งาน (สลับสิทธิ์การทำงาน) -->
+      <div class="who">
+        <label for="role">🎭 สวมบทบาทเป็น (POV)</label>
+        <select id="role"></select>
+      </div>
+
+      <!-- เมนูคลิกเปลี่ยนหน้า -->
+      <nav id="nav"></nav>
+
+      <div class="side-footer">
+        <div style="font-weight: 700; color: #ffffff; margin-bottom: 4px;">💡 ข้อแนะนำการใช้งาน</div>
+        สลับบทบาทด้านบนเพื่อลองส่งใบเบิกจากสาขา แล้วสลับกลับมาที่คลังกลางเพื่อกดอนุมัติระบบจะตัดสต็อกอัตโนมัติ!
+      </div>
+    </aside>
+
+    <!-- พื้นที่แสดงผลเนื้อหาแต่ละหน้า -->
+    <main id="main"></main>
+  </div>
+
+  <!-- พื้นที่สำหรับแสดง Modal Dialog -->
+  <div id="layer"></div>
+
+  <!-- ===================================================
+       6. โค้ดโปรแกรม JavaScript การทำงานทั้งหมดของระบบ
+       =================================================== -->
+  <script>
+    // ---------------------------------------------------
+    // 6.1 ค่าคงที่ของระบบ (System Constants)
+    // ---------------------------------------------------
+    const BRANCH_NAMES = {
+      C: 'คลังกลาง (HQ)',
+      B1: 'สาขา 1 (สยาม)',
+      B2: 'สาขา 2 (อารีย์)',
+      B3: 'สาขา 3 (บางนา)'
+    };
+
+    const BRANCH_KEYS = ['B1', 'B2', 'B3'];
+
+    const PRODUCT_CATEGORIES = [
+      'อาหารสุนัข',
+      'อาหารแมว',
+      'อาหารเสริม',
+      'อุปกรณ์'
+    ];
+
+    const CATEGORY_EMOJIS = {
+      'อาหารสุนัข': '🐶',
+      'อาหารแมว': '🐱',
+      'อาหารเสริม': '💊',
+      'อุปกรณ์': '🧸'
+    };
+
+    // ฟังก์ชันช่วยสร้าง Object สินค้า (Product Factory Function)
+    function createProduct(id, name, cat, unit, min, stockHQ, stockB1, stockB2, stockB3, icon = '📦') {
+      return {
+        id: id,
+        name: name,
+        cat: cat,
+        unit: unit,
+        min: min,
+        ico: icon,
+        stock: {
+          C: stockHQ,
+          B1: stockB1,
+          B2: stockB2,
+          B3: stockB3
+        }
+      };
+    }
+
+    // ฟังก์ชันคำนวณวันที่ย้อนหลังหรือล่วงหน้าในรูปแบบ YYYY-MM-DD
+    function getDateOffset(days) {
+      const targetDate = new Date();
+      targetDate.setDate(targetDate.getDate() + days);
+      return targetDate.toISOString().slice(0, 10);
+    }
+
+    // ข้อมูลเริ่มต้นสำหรับระบบ (Seed Initial Data)
+    const SEED_DATA = {
+      products: [
+        createProduct(1, 'อาหารสุนัขโต รสเนื้อวากิว 3 กก.', 'อาหารสุนัข', 'ถุง', 20, 120, 14, 10, 8, '🥩'),
+        createProduct(2, 'อาหารลูกสุนัข นมแพะพรีเมียม 1.5 กก.', 'อาหารสุนัข', 'ถุง', 15, 60, 6, 9, 4, '🍼'),
+        createProduct(3, 'อาหารเปียกสุนัข ซุปไก่ฉ่ำๆ 400 ก.', 'อาหารสุนัข', 'กระป๋อง', 50, 300, 40, 35, 22, '🥫'),
+        createProduct(4, 'อาหารแมวโต ปลาทูทอดกรอบ 1 กก.', 'อาหารแมว', 'ถุง', 25, 12, 12, 18, 7, '🐟'),
+        createProduct(5, 'อาหารลูกแมว แซลมอนนอร์เวย์ 400 ก.', 'อาหารแมว', 'ถุง', 20, 90, 10, 6, 12, '🍣'),
+        createProduct(6, 'อาหารเปียกแงว เกรวี่ทูน่า 85 ก.', 'อาหารแมว', 'ซอง', 100, 640, 90, 120, 75, '🐱'),
+        createProduct(7, 'วิตามินบำรุงขนจึ้งๆ เงาตาแตก', 'อาหารเสริม', 'ขวด', 10, 40, 5, 4, 3, '✨'),
+        createProduct(8, 'แคลเซียมบูสต์กระดูกน้องหมา', 'อาหารเสริม', 'กระปุก', 10, 8, 3, 5, 2, '🦴'),
+        createProduct(9, 'ขนมขัดฟัน ลมหายใจหอมฟุ้ง', 'อาหารเสริม', 'ห่อ', 30, 150, 25, 20, 18, '🦷'),
+        createProduct(10, 'สายจูงแฟชั่น Y2K สะท้อนแสง', 'อุปกรณ์', 'เส้น', 10, 35, 6, 5, 4, '🦮'),
+        createProduct(11, 'ทรายแมวเต้าหู้ กลิ่นมัทฉะ 10 ลิตร', 'อุปกรณ์', 'ถุง', 20, 55, 9, 12, 6, '🍵'),
+        createProduct(12, 'ชามอาหารสแตนเลส กันมดตัวตึง', 'อุปกรณ์', 'ใบ', 10, 48, 8, 7, 5, '🥣')
+      ],
+      reqs: [
+        {
+          id: 1,
+          br: 'B2',
+          date: getDateOffset(-1),
+          items: [{ pid: 4, q: 20 }, { pid: 8, q: 6 }],
+          status: 'wait',
+          note: 'ของใกล้หมดแล้วครับ ลูกค้าถามหาเยอะมากช่วงโปรโมชัน 🔥'
+        },
+        {
+          id: 2,
+          br: 'B3',
+          date: getDateOffset(0),
+          items: [{ pid: 1, q: 10 }, { pid: 11, q: 8 }],
+          status: 'wait',
+          note: 'ขอเติมด่วนครับ ลูกค้าเหมาทรายมัทฉะเกลี้ยงร้านแล้ว'
+        }
+      ],
+      log: [],
+      nid: 3
+    };
+
+    // ---------------------------------------------------
+    // 6.2 ตัวแปรสถานะและการบันทึกข้อมูล (State & LocalStorage)
+    // ---------------------------------------------------
+    const STORAGE_KEY = 'petstock_genz1';
+    let appState = null;
+    let currentRole = 'C';      // ค่าเริ่มต้น: คลังกลาง (C = HQ)
+    let currentTab = 'dash';    // หน้าปัจจุบัน
+    let searchQuery = '';       // คำค้นหา
+    let categoryFilter = '';    // ตัวกรองหมวดหมู่
+    let filterLowOnly = false;  // กรองเฉพาะของใกล้หมด
+    let requisitionCart = {};   // ตะกร้าสำหรับสร้างใบเบิก
+
+    // ฟังก์ชันโหลดข้อมูลจาก LocalStorage
+    function loadAppState() {
+      try {
+        const savedData = localStorage.getItem(STORAGE_KEY);
+        if (savedData) {
+          appState = JSON.parse(savedData);
+        }
+      } catch (err) {
+        console.error('ไม่สามารถโหลดข้อมูลจาก LocalStorage ได้:', err);
+      }
+
+      if (!appState || !appState.products) {
+        appState = JSON.parse(JSON.stringify(SEED_DATA));
+      }
+    }
+
+    // ฟังก์ชันบันทึกข้อมูลลง LocalStorage
+    function saveAppState() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+      } catch (err) {
+        console.error('ไม่สามารถบันทึกข้อมูลลง LocalStorage ได้:', err);
+      }
+    }
+
+    // เริ่มโหลดข้อมูล
+    loadAppState();
+
+    // ---------------------------------------------------
+    // 6.3 ฟังก์ชันตัวช่วยทั่วไป (Utility Helper Functions)
+    // ---------------------------------------------------
+    function getEl(id) {
+      return document.getElementById(id);
+    }
+
+    function findProduct(id) {
+      return appState.products.find(item => item.id === id);
+    }
+
+    // แปลงอักขระพิเศษเพื่อความปลอดภัย ป้องกัน XSS
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str).replace(/[&<>"']/g, match => {
+        const escapes = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
+        return escapes[match];
+      });
+    }
+
+    // จัดรูปแบบวันที่เป็น วว/ดด/ปปปป (พ.ศ.)
+    function formatThaiDate(dateString) {
+      if (!dateString) return '-';
+      const parts = dateString.split('-');
+      if (parts.length !== 3) return dateString;
+      const yearBE = parseInt(parts[0], 10) + 543;
+      return `${parts[2]}/${parts[1]}/${yearBE}`;
+    }
+
+    // แสดงป้ายสถานะของใบเบิก
+    function getStatusBadge(status) {
+      if (status === 'wait') {
+        return '<span class="pill p-wait">⏳ รออนุมัติ (ลุ้นอยู่)</span>';
+      } else if (status === 'ok') {
+        return '<span class="pill p-ok">✅ อนุมัติแล้ว</span>';
+      }
+      return '<span class="pill p-no">❌ ไม่อนุมัติ / ปัดตก</span>';
+    }
+
+    // แสดงแจ้งเตือนแบบ Toast ชั่วคราว
+    function showToast(message) {
+      const toastEl = document.createElement('div');
+      toastEl.className = 'toast';
+      toastEl.textContent = message;
+      document.body.appendChild(toastEl);
+      setTimeout(() => {
+        toastEl.remove();
+      }, 2600);
+    }
+
+    // แสดงหน้าต่าง Modal Dialog
+    function showModal(contentHtml) {
+      const layerEl = getEl('layer');
+      layerEl.innerHTML = `
+        <div class="modal" onclick="if(event.target===this) closeModal()">
+          <div class="box">${contentHtml}</div>
+        </div>
+      `;
+    }
+
+    // ปิดหน้าต่าง Modal Dialog
+    function closeModal() {
+      getEl('layer').innerHTML = '';
+    }
+
+    // ปล่อยเอฟเฟกต์กระดาษสายรุ้ง (Confetti)
+    function triggerConfetti() {
+      const emojis = ['✨', '🐾', '💖', '🔥', '🎉', '🦴', '🐟'];
+      for (let i = 0; i < 16; i++) {
+        const confettiEl = document.createElement('div');
+        confettiEl.className = 'confetti';
+        confettiEl.textContent = emojis[i % emojis.length];
+        confettiEl.style.left = `${(window.innerWidth / 2) + (Math.random() * 80 - 40)}px`;
+        confettiEl.style.top = `${window.innerHeight / 2}px`;
+        confettiEl.style.setProperty('--tx', `${Math.random() * 360 - 180}px`);
+        confettiEl.style.setProperty('--ty', `${Math.random() * -280 - 40}px`);
+        document.body.appendChild(confettiEl);
+
+        setTimeout(() => {
+          confettiEl.remove();
+        }, 1000);
+      }
+    }
+
+    // บันทึกกิจกรรมลง Timeline ประวัติ
+    function logActivity(message) {
+      appState.log.unshift({
+        t: new Date().toISOString(),
+        m: message
+      });
+      // เก็บประวัติสูงสุด 100 รายการล่าสุด
+      if (appState.log.length > 100) {
+        appState.log = appState.log.slice(0, 100);
+      }
+    }
+
+    // นับจำนวนใบเบิกที่ค้างการอนุมัติ
+    function getPendingCount() {
+      return appState.reqs.filter(r => r.status === 'wait').length;
+    }
+
+    // ตรวจสอบว่าปัจจุบันคือคลังกลางหรือไม่
+    function isCentralHQ() {
+      return currentRole === 'C';
+    }
+
+    // สลับธีมสี (Y2K Pop / Coquette / Cyber Neon)
+    function setVibe(vibeName) {
+      document.documentElement.setAttribute('data-vibe', vibeName);
+      ['pop', 'coquette', 'cyber'].forEach(theme => {
+        const btn = getEl(`vb-${theme}`);
+        if (btn) {
+          btn.className = `vibe-btn ${theme === vibeName ? 'active' : ''}`;
+        }
+      });
+      try {
+        localStorage.setItem('petstock_vibe', vibeName);
+      } catch (err) {}
+    }
+
+    // คืนค่าธีมที่บันทึกไว้ในเครื่อง
+    try {
+      const savedVibe = localStorage.getItem('petstock_vibe');
+      if (savedVibe) setVibe(savedVibe);
+    } catch (err) {}
+
+    // ---------------------------------------------------
+    // 6.4 การนำทางและเมนู (Navigation & Routing)
+    // ---------------------------------------------------
+    const NAVIGATION_TABS = {
+      C: [
+        { id: 'dash', icon: '🌈', label: 'แดชบอร์ดคลังกลาง' },
+        { id: 'stock', icon: '📦', label: 'คลังสินค้า (HQ)' },
+        { id: 'reqs', icon: '💌', label: 'คำขอเบิกเข้า' },
+        { id: 'all', icon: '🔥', label: 'ส่องสต็อกทุกสาขา' },
+        { id: 'log', icon: '📜', label: 'ไทม์ไลน์ประวัติ' }
+      ],
+      B: [
+        { id: 'dash', icon: '🌈', label: 'แดชบอร์ดสาขา' },
+        { id: 'new', icon: '🛒', label: 'สร้างใบเบิกสินค้า' },
+        { id: 'reqs', icon: '💌', label: 'สถานะใบเบิกของฉัน' },
+        { id: 'stock', icon: '📦', label: 'เช็กสต็อกในสาขา' }
+      ]
+    };
+
+    function navigateToTab(tabId) {
+      currentTab = tabId;
+      searchQuery = '';
+      categoryFilter = '';
+      filterLowOnly = false;
+      renderApp();
+      window.scrollTo(0, 0);
+    }
+
+    // ---------------------------------------------------
+    // 6.5 ส่วนประกอบ UI ส่วนกลาง (Shared Components)
+    // ---------------------------------------------------
+    function renderSectionHeader(tagText, titleText, subtitleText, actionButtonHtml = '') {
+      return `
+        <div class="head">
+          <div>
+            <div class="head-tag">${tagText}</div>
+            <h1>${titleText}</h1>
+            <p>${subtitleText}</p>
+          </div>
+          ${actionButtonHtml}
+        </div>
+      `;
+    }
+
+    function renderStockProgressBar(product, roleKey) {
+      const maxTarget = product.min * (roleKey === 'C' ? 3 : 1.5);
+      const percentage = Math.min(100, Math.round((product.stock[roleKey] / maxTarget) * 100));
+      const isLow = product.stock[roleKey] <= product.min;
+      return `
+        <div class="bar ${isLow ? 'low' : ''}">
+          <i style="width: ${percentage}%"></i>
+        </div>
+      `;
+    }
+
+    function renderFilterTools() {
+      const chipButtons = `
+        <div class="chip-bar">
+          <button class="chip ${!categoryFilter && !filterLowOnly ? 'on' : ''}" onclick="categoryFilter=''; filterLowOnly=false; renderApp()">
+            ✨ ทั้งหมด
+          </button>
+          ${PRODUCT_CATEGORIES.map(category => `
+            <button class="chip ${categoryFilter === category ? 'on' : ''}" onclick="setCategoryFilter('${category}')">
+              ${CATEGORY_EMOJIS[category]} ${category}
+            </button>
+          `).join('')}
+          <button class="chip ${filterLowOnly ? 'on' : ''}" onclick="toggleLowStockFilter()">
+            🚨 ของใกล้หมด
+          </button>
+        </div>
+      `;
+
+      return `
+        <div class="tools">
+          <input id="sq" type="search" placeholder="🔍 ค้นหาสินค้า เช่น เนื้อวากิว, ทรายแมวมัทฉะ..." value="${escapeHtml(searchQuery)}" oninput="handleSearchInput(this.value)">
+        </div>
+        ${chipButtons}
+      `;
+    }
+
+    function handleSearchInput(value) {
+      searchQuery = value;
+      const activeEl = document.activeElement;
+      const cursorPosition = activeEl ? activeEl.selectionStart : null;
+      renderApp();
+      const inputEl = getEl('sq');
+      if (inputEl && cursorPosition !== null) {
+        inputEl.focus();
+        try {
+          inputEl.setSelectionRange(cursorPosition, cursorPosition);
+        } catch (err) {}
+      }
+    }
+
+    function setCategoryFilter(category) {
+      categoryFilter = (categoryFilter === category) ? '' : category;
+      renderApp();
+    }
+
+    function toggleLowStockFilter() {
+      filterLowOnly = !filterLowOnly;
+      renderApp();
+    }
+
+    // กรองรายการสินค้าตามการค้นหาและเงื่อนไข
+    function getFilteredProducts() {
+      return appState.products.filter(product => {
+        const matchesCategory = !categoryFilter || product.cat === categoryFilter;
+        const matchesSearch = !searchQuery ||
+          product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          product.cat.toLowerCase().includes(searchQuery.toLowerCase());
+        const matchesLow = !filterLowOnly || product.stock[currentRole] <= product.min;
+        return matchesCategory && matchesSearch && matchesLow;
+      });
+    }
+
+    // ---------------------------------------------------
+    // 6.6 หน้าแดชบอร์ดหลัก (Dashboard View)
+    // ---------------------------------------------------
+    function renderDashboardView() {
+      const roleKey = currentRole;
+      const lowStockProducts = appState.products.filter(p => p.stock[roleKey] <= p.min);
+      const totalStock = appState.products.reduce((sum, p) => sum + p.stock[roleKey], 0);
+      const roleReqs = isCentralHQ() ? appState.reqs : appState.reqs.filter(r => r.br === currentRole);
+      const pendingReqs = roleReqs.filter(r => r.status === 'wait').length;
+
+      const headerAction = isCentralHQ()
+        ? '<button class="btn gold" onclick="openReceiveStockModal()">⚡ รับของเข้าคลังด่วน</button>'
+        : '<button class="btn" onclick="navigateToTab(\'new\')">🛒 สร้างใบเบิกสินค้า</button>';
+
+      let html = renderSectionHeader(
+        isCentralHQ() ? '👑 HQ COMMAND CENTER' : `🏪 BRANCH VIBES · ${BRANCH_NAMES[currentRole]}`,
+        isCentralHQ() ? 'ภาพรวมคลังกลางแบบเรียลไทม์ ✨' : `อัปเดตสต็อก ${BRANCH_NAMES[currentRole]} 🐾`,
+        isCentralHQ() ? 'เช็กของเข้า-ออก อนุมัติใบเบิก ตัดสต็อกสาขาอัตโนมัติ' : 'ของชิ้นไหนใกล้หมด กดส่งขอเบิกจากคลังกลางได้ทันที',
+        headerAction
+      );
+
+      // สรุปสถิติสำคัญแบบ Bento Card
+      html += `
+        <div class="grid stats">
+          <div class="stat">
+            <div class="sticker">📦</div>
+            <small>ของในสต็อกรวม</small>
+            <span class="num">${totalStock.toLocaleString()}</span>
+            <span class="sub">ชิ้นพร้อมจำหน่าย</span>
+          </div>
+          <div class="stat b">
+            <div class="sticker">🐾</div>
+            <small>ไอเทมทั้งหมด</small>
+            <span class="num">${appState.products.length}</span>
+            <span class="sub">SKU ทั้งหมดในระบบ</span>
+          </div>
+          <div class="stat r">
+            <div class="sticker">🚨</div>
+            <small>ของใกล้หมด (ต้องเติม!)</small>
+            <span class="num">${lowStockProducts.length}</span>
+            <span class="sub">${lowStockProducts.length ? 'รีบเติมก่อนขาดเชลฟ์' : 'สต็อกแน่น ปลอดภัย'}</span>
+          </div>
+          <div class="stat g">
+            <div class="sticker">💌</div>
+            <small>ใบเบิกรออนุมัติ</small>
+            <span class="num">${pendingReqs}</span>
+            <span class="sub">${pendingReqs ? 'มีคำขอรอพิจารณา' : 'เคลียร์ครบ ไม่มีค้าง'}</span>
+          </div>
+        </div>
+      `;
+
+      // แนะนำเวิร์กโฟลว์การทำงาน
+      html += `
+        <div class="card">
+          <div class="card-title">
+            <h2>⚡ ขั้นตอนการทำงานของระบบ (Workflow)</h2>
+          </div>
+          <div class="flow">
+            <b>1. สาขากดสั่งเบิก 🛒</b>
+            <span>➜</span>
+            <b>2. คลังกลางตรวจสอบสต็อก 👀</b>
+            <span>➜</span>
+            <b>3. กดอนุมัติรายการ ✅</b>
+            <span>➜</span>
+            <b>4. ตัดสต็อกคลังกลาง & โอนเข้าสาขาอัตโนมัติ 🚀</b>
+          </div>
+        </div>
+      `;
+
+      // รายการสินค้าที่ระดับสต็อกต่ำกว่าเกณฑ์
+      html += `
+        <div class="card">
+          <div class="card-title">
+            <h2>🚨 รายการสินค้าใกล้หมด ${isCentralHQ() ? '(ต้องสั่งซื้อเพิ่มเข้าคลัง)' : '(ต้องกดขอเบิกเข้าสาขา)'}</h2>
+            ${(!isCentralHQ() && lowStockProducts.length) ? '<button class="btn s gold" onclick="autoAddLowStockToCart()">⚡ เลือกใส่ตะกร้าเบิกอัตโนมัติ</button>' : ''}
+          </div>
+      `;
+
+      if (lowStockProducts.length === 0) {
+        html += '<div class="empty">🎉 ยอดเยี่ยมมาก! ไม่มีรายการสินค้าที่ต่ำกว่าเกณฑ์ สต็อกพร้อมจำหน่าย</div>';
+      } else {
+        html += `
+          <div class="wrap">
+            <table class="tbl">
+              <thead>
+                <tr>
+                  <th>สินค้า</th>
+                  <th class="r-">คงเหลือ</th>
+                  <th class="r-">จุดต้องเติม (Min)</th>
+                  <th>สถานะ</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${lowStockProducts.map(product => `
+                  <tr>
+                    <td>
+                      <div class="item-cell">
+                        <div class="item-ico">${product.ico}</div>
+                        <div>
+                          <b>${product.name}</b><br>
+                          <small style="color: var(--mute)">${product.cat}</small>
+                        </div>
+                      </div>
+                    </td>
+                    <td class="r- low">${product.stock[roleKey]} ${product.unit}</td>
+                    <td class="r-">${product.min} ${product.unit}</td>
+                    <td><span class="pill p-no">🔥 ใกล้หมด</span></td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        `;
+      }
+      html += '</div>';
+
+      // ถ้าเป็นคลังกลางและมีใบเบิกค้างอยู่ แสดงตารางให้พิจารณาได้ทันที
+      if (isCentralHQ() && pendingReqs > 0) {
+        const waitList = appState.reqs.filter(r => r.status === 'wait');
+        html += `
+          <div class="card">
+            <div class="card-title">
+              <h2>💌 ใบเบิกที่รอคลังกลางเคาะอนุมัติ (${pendingReqs})</h2>
+            </div>
+            ${renderRequisitionTableRows(waitList)}
+          </div>
+        `;
+      }
+
+      return html;
+    }
+
+    // ฟังก์ชันช่วยดึงรายการของใกล้หมดเข้าตะกร้าเบิกทันที
+    function autoAddLowStockToCart() {
+      const lowProducts = appState.products.filter(p => p.stock[currentRole] <= p.min);
+      if (!lowProducts.length) {
+        showToast('🎉 ไม่มีสินค้าใกล้หมดเลยจ้า สต็อกยังแน่นดีอยู่!');
+        return;
+      }
+      requisitionCart = {};
+      lowProducts.forEach(product => {
+        const requiredAmount = Math.max(5, (product.min * 2) - product.stock[currentRole]);
+        const availableInHQ = product.stock.C;
+        if (availableInHQ > 0) {
+          requisitionCart[product.id] = Math.min(requiredAmount, availableInHQ);
+        }
+      });
+      currentTab = 'new';
+      renderApp();
+      showToast('⚡ ดึงรายการของใกล้หมดใส่ใบเบิกให้อัตโนมัติแล้ว!');
+    }
+
+    // ---------------------------------------------------
+    // 6.7 หน้ารายการสต็อกสินค้า (Stock Table View)
+    // ---------------------------------------------------
+    function renderStockView() {
+      const roleKey = currentRole;
+      const headerAction = isCentralHQ()
+        ? '<button class="btn gold" onclick="openReceiveStockModal()">+ รับของเข้าคลังกลาง</button>'
+        : '';
+
+      const header = renderSectionHeader(
+        isCentralHQ() ? '📦 HQ STOCKROOM' : '📦 BRANCH STOCK',
+        isCentralHQ() ? 'คลังสินค้าส่วนกลาง (HQ)' : `สต็อกสินค้าประจำ ${BRANCH_NAMES[currentRole]}`,
+        isCentralHQ() ? 'เมื่อกดอนุมัติใบเบิก ระบบจะตัดยอดคงเหลือที่นี่ให้อัตโนมัติ' : 'เมื่อคลังกลางอนุมัติแล้ว สินค้าจะถูกเพิ่มเข้าหน้านี้ทันที',
+        headerAction
+      );
+
+      const filteredList = getFilteredProducts();
+      let tableContent = '';
+
+      if (filteredList.length === 0) {
+        tableContent = '<div class="empty">🥹 ไม่พบสินค้าตามเงื่อนไขที่ค้นหา ลองเปลี่ยนคำค้นหาดูนะครับ</div>';
+      } else {
+        const rows = filteredList.map(product => {
+          const isLow = product.stock[roleKey] <= product.min;
+          return `
+            <tr>
+              <td>
+                <div class="item-cell">
+                  <div class="item-ico">${product.ico}</div>
+                  <div>
+                    <b>${product.name}</b><br>
+                    <small style="color: var(--mute)">${CATEGORY_EMOJIS[product.cat]} ${product.cat}</small>
+                  </div>
+                </div>
+              </td>
+              <td class="r- ${isLow ? 'low' : ''}" style="font-size: 16px; font-weight: 700">
+                ${product.stock[roleKey]} <small>${product.unit}</small>
+              </td>
+              <td style="width: 140px">
+                ${renderStockProgressBar(product, roleKey)}
+              </td>
+              <td>
+                ${isLow ? '<span class="pill p-no">🚨 ต่ำกว่าเกณฑ์</span>' : '<span class="pill p-ok">✨ พร้อมจำหน่าย</span>'}
+              </td>
+            </tr>
+          `;
+        }).join('');
+
+        tableContent = `
+          <div class="wrap">
+            <table class="tbl">
+              <thead>
+                <tr>
+                  <th>สินค้า</th>
+                  <th class="r-">คงเหลือ</th>
+                  <th>ระดับสต็อก</th>
+                  <th>สถานะ</th>
+                </tr>
+              </thead>
+              <tbody>${rows}</tbody>
+            </table>
+          </div>
+        `;
+      }
+
+      return header + `<div class="card">${renderFilterTools()}${tableContent}</div>`;
+    }
+
+    // ---------------------------------------------------
+    // 6.8 หน้าเรดาร์ส่องสต็อกทุกสาขา (All Branches Radar View)
+    // ---------------------------------------------------
+    function renderAllStockRadarView() {
+      const filteredList = getFilteredProducts();
+      const rows = filteredList.map(product => {
+        const totalAll = ['C', ...BRANCH_KEYS].reduce((sum, key) => sum + product.stock[key], 0);
+        return `
+          <tr>
+            <td>
+              <div class="item-cell">
+                <div class="item-ico">${product.ico}</div>
+                <div>
+                  <b>${product.name}</b><br>
+                  <small style="color: var(--mute)">Min เกณฑ์ขั้นต่ำ: ${product.min} ${product.unit}</small>
+                </div>
+              </div>
+            </td>
+            ${['C', ...BRANCH_KEYS].map(key => `
+              <td class="r- ${product.stock[key] <= product.min ? 'low' : ''}">
+                ${product.stock[key]}
+              </td>
+            `).join('')}
+            <td class="r-" style="font-weight: 800; font-size: 16px;">
+              ${totalAll}
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      return renderSectionHeader(
+        '🔥 ALL-BRANCH RADAR',
+        'เรดาร์เปรียบเทียบสต็อกทุกสาขาแบบเรียลไทม์',
+        'ตัวเลขสีแดง = สต็อกต่ำกว่าเกณฑ์ขั้นต่ำ ต้องวางแผนเติมสินค้าด่วน'
+      ) + `
+        <div class="card">
+          ${renderFilterTools()}
+          <div class="wrap">
+            <table class="tbl">
+              <thead>
+                <tr>
+                  <th>สินค้า</th>
+                  <th class="r-">👑 คลังกลาง</th>
+                  <th class="r-">สาขา 1 (สยาม)</th>
+                  <th class="r-">สาขา 2 (อารีย์)</th>
+                  <th class="r-">สาขา 3 (บางนา)</th>
+                  <th class="r-">รวมทุกที่</th>
+                </tr>
+              </thead>
+              <tbody>${rows}</tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+
+    // ---------------------------------------------------
+    // 6.9 ระบบรับสินค้าเข้าคลังกลาง (Receive Stock into HQ)
+    // ---------------------------------------------------
+    function openReceiveStockModal() {
+      const options = appState.products.map(product => `
+        <option value="${product.id}">
+          ${product.ico} ${product.name} (คลังกลางมี: ${product.stock.C} ${product.unit})
+        </option>
+      `).join('');
+
+      const modalHtml = `
+        <h2>📦 รับสินค้าเข้าคลังกลาง (HQ)</h2>
+        <p style="color: var(--mute)">นำเข้าสินค้าจากโรงงาน/ซัพพลายเออร์ เพื่อเตรียมพร้อมกระจายให้สาขา</p>
+        <div style="margin-top: 14px;">
+          <label style="font-weight: 700; display: block; margin-bottom: 6px;">เลือกสินค้า</label>
+          <select id="rp" class="f">${options}</select>
+        </div>
+        <div style="margin-top: 14px;">
+          <label style="font-weight: 700; display: block; margin-bottom: 6px;">จำนวนที่รับเข้า</label>
+          <input id="rq" type="number" min="1" value="20" style="width: 140px">
+        </div>
+        <div class="row">
+          <button class="btn o" onclick="closeModal()">ยกเลิก</button>
+          <button class="btn gold" onclick="submitReceiveStock()">✨ ยืนยันรับเข้าคลัง</button>
+        </div>
+      `;
+      showModal(modalHtml);
+    }
+
+    function submitReceiveStock() {
+      const productId = parseInt(getEl('rp').value, 10);
+      const quantity = parseInt(getEl('rq').value, 10);
+      const product = findProduct(productId);
+
+      if (!product || isNaN(quantity) || quantity <= 0) {
+        showToast('⚠️ กรุณากรอกจำนวนสินค้าให้ถูกต้อง (ต้องมากกว่า 0)');
+        return;
+      }
+
+      product.stock.C += quantity;
+      logActivity(`📦 รับเข้าคลังกลาง: ${product.name} +${quantity} ${product.unit}`);
+      saveAppState();
+      closeModal();
+      triggerConfetti();
+      showToast(`🎉 รับสินค้าเข้าคลังกลางเรียบร้อย (+${quantity} ${product.unit})`);
+      renderApp();
+    }
+
+    // ---------------------------------------------------
+    // 6.10 ระบบสร้างใบเบิกสินค้าของสาขา (Requisition Form)
+    // ---------------------------------------------------
+    function renderNewRequisitionView() {
+      const header = renderSectionHeader(
+        '🛒 QUICK REQUISITION',
+        `กดขอเบิกสินค้าเข้า ${BRANCH_NAMES[currentRole]}`,
+        'ระบุจำนวนที่ต้องการ แล้วกดส่งใบเบิกเพื่อให้คลังกลางตรวจสอบและอนุมัติ',
+        '<button class="btn o s" onclick="autoAddLowStockToCart()">⚡ เติมของใกล้หมดให้อัตโนมัติ</button>'
+      );
+
+      const filteredList = getFilteredProducts();
+      let tableContent = '';
+
+      if (filteredList.length === 0) {
+        tableContent = '<div class="empty">🥹 ไม่พบสินค้าตามที่ค้นหา</div>';
+      } else {
+        tableContent = `
+          <div class="wrap">
+            <table class="tbl">
+              <thead>
+                <tr>
+                  <th>สินค้า</th>
+                  <th class="r-">สาขาเรามี</th>
+                  <th class="r-">คลังกลางมี</th>
+                  <th class="r-">จำนวนที่ขอเบิก</th>
+                </tr>
+              </thead>
+              <tbody>
+        `;
+
+        PRODUCT_CATEGORIES.forEach(category => {
+          const groupProducts = filteredList.filter(p => p.cat === category);
+          if (!groupProducts.length) return;
+
+          tableContent += `
+            <tr>
+              <td colspan="4" class="cat">
+                ${CATEGORY_EMOJIS[category]} หมวดหมู่: ${category}
+              </td>
+            </tr>
+          `;
+
+          groupProducts.forEach(product => {
+            const isBranchLow = product.stock[currentRole] <= product.min;
+            const currentAmount = requisitionCart[product.id] || '';
+
+            tableContent += `
+              <tr>
+                <td>
+                  <div class="item-cell">
+                    <div class="item-ico">${product.ico}</div>
+                    <div><b>${product.name}</b></div>
+                  </div>
+                </td>
+                <td class="r- ${isBranchLow ? 'low' : ''}">
+                  ${product.stock[currentRole]} ${product.unit}
+                </td>
+                <td class="r-">
+                  ${product.stock.C} ${product.unit}
+                </td>
+                <td class="r-">
+                  <input type="number" min="0" max="${product.stock.C}" value="${currentAmount}" placeholder="0" oninput="updateCartItem(${product.id}, this.value)">
+                  <small>${product.unit}</small>
+                </td>
+              </tr>
+            `;
+          });
+        });
+
+        tableContent += '</tbody></table></div>';
+      }
+
+      const footerSummary = `
+        <div class="row" style="align-items: center; border-top: 2px dashed var(--soft-line); padding-top: 14px;">
+          <span id="cart-summary" style="font-weight: 700; margin-right: auto;">
+            ${getCartSummaryText()}
+          </span>
+          <button class="btn o" onclick="clearRequisitionCart()">ล้างตะกร้า</button>
+          <button class="btn" onclick="openConfirmRequisitionModal()">🚀 ส่งใบเบิกให้คลังกลาง</button>
+        </div>
+      `;
+
+      return header + `<div class="card">${renderFilterTools()}${tableContent}${footerSummary}</div>`;
+    }
+
+    function getSelectedCartKeys() {
+      return Object.keys(requisitionCart).filter(key => requisitionCart[key] > 0);
+    }
+
+    function getCartSummaryText() {
+      const selected = getSelectedCartKeys();
+      if (!selected.length) {
+        return '✨ ยังไม่ได้ระบุจำนวนสินค้าที่ต้องการเบิก';
+      }
+      return `🛍️ เลือกไว้แล้ว ${selected.length} รายการ พร้อมส่งคำขอ`;
+    }
+
+    function updateCartItem(productId, value) {
+      const parsed = parseInt(value, 10);
+      requisitionCart[productId] = (!isNaN(parsed) && parsed > 0) ? parsed : 0;
+      const summaryEl = getEl('cart-summary');
+      if (summaryEl) {
+        summaryEl.textContent = getCartSummaryText();
+      }
+    }
+
+    function clearRequisitionCart() {
+      requisitionCart = {};
+      renderApp();
+    }
+
+    function openConfirmRequisitionModal() {
+      const selectedKeys = getSelectedCartKeys();
+      if (!selectedKeys.length) {
+        showToast('⚠️ กรุณาระบุจำนวนสินค้าอย่างน้อย 1 รายการก่อนส่งใบเบิก');
+        return;
+      }
+
+      const rows = selectedKeys.map(key => {
+        const product = findProduct(parseInt(key, 10));
+        return `
+          <tr>
+            <td>${product.ico} ${product.name}</td>
+            <td class="r-" style="font-weight: 800;">${requisitionCart[key]} ${product.unit}</td>
+          </tr>
+        `;
+      }).join('');
+
+      const modalHtml = `
+        <h2>💌 ยืนยันการส่งใบเบิกสินค้า</h2>
+        <p style="color: var(--mute)">ส่งคำขอไปยังคลังกลางเพื่อรอตรวจสอบและอนุมัติตัดสต็อก</p>
+        <div class="wrap">
+          <table class="tbl">${rows}</table>
+        </div>
+        <div style="margin-top: 14px;">
+          <label style="font-weight: 700; display: block; margin-bottom: 6px;">ข้อความบันทึกถึงคลังกลาง 💬</label>
+          <input id="req-note" type="text" placeholder="เช่น ขอเติมด่วนช่วงโปรโมชัน ลูกค้าต้องการเยอะ">
+        </div>
+        <div class="row">
+          <button class="btn o" onclick="closeModal()">กลับไปแก้ไข</button>
+          <button class="btn" onclick="submitRequisition()">🚀 ยืนยันส่งใบเบิก</button>
+        </div>
+      `;
+      showModal(modalHtml);
+    }
+
+    function submitRequisition() {
+      const selectedKeys = getSelectedCartKeys();
+      const items = selectedKeys.map(key => ({
+        pid: parseInt(key, 10),
+        q: requisitionCart[key]
+      }));
+
+      const noteText = getEl('req-note') ? getEl('req-note').value.trim() : '';
+
+      appState.reqs.unshift({
+        id: appState.nid++,
+        br: currentRole,
+        date: getDateOffset(0),
+        items: items,
+        status: 'wait',
+        note: noteText
+      });
+
+      logActivity(`💌 ${BRANCH_NAMES[currentRole]} ส่งใบเบิกจำนวน ${items.length} รายการ`);
+      requisitionCart = {};
+      saveAppState();
+      closeModal();
+      triggerConfetti();
+      showToast('🚀 ส่งใบเบิกเรียบร้อยแล้ว! อยู่ระหว่างรอคลังกลางอนุมัติ');
+      currentTab = 'reqs';
+      renderApp();
+    }
+
+    // ---------------------------------------------------
+    // 6.11 รายการและการพิจารณาใบเบิก (Requisition Management)
+    // ---------------------------------------------------
+    function renderRequisitionTableRows(requisitionList) {
+      if (!requisitionList.length) {
+        return '<div class="empty">✨ ยังไม่มีรายการใบเบิกในระบบ</div>';
+      }
+
+      return `
+        <div class="wrap">
+          <table class="tbl">
+            <thead>
+              <tr>
+                <th>เลขที่ใบเบิก</th>
+                <th>วันที่</th>
+                ${isCentralHQ() ? '<th>สาขาที่ขอเบิก</th>' : ''}
+                <th>จำนวนรายการ</th>
+                <th>สถานะ</th>
+                <th>หมายเหตุ</th>
+                <th class="r-">การจัดการ</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${requisitionList.map(req => {
+                const isWaitingHQ = isCentralHQ() && req.status === 'wait';
+                return `
+                  <tr>
+                    <td><b>#${String(req.id).padStart(4, '0')}</b></td>
+                    <td>${formatThaiDate(req.date)}</td>
+                    ${isCentralHQ() ? `<td><b>${BRANCH_NAMES[req.br]}</b></td>` : ''}
+                    <td>${req.items.length} รายการ</td>
+                    <td>${getStatusBadge(req.status)}</td>
+                    <td style="color: var(--mute); max-width: 200px;">${req.note ? escapeHtml(req.note) : '-'}</td>
+                    <td class="r-">
+                      <button class="btn s ${isWaitingHQ ? 'gold' : 'o'}" onclick="openViewRequisitionModal(${req.id})">
+                        ${isWaitingHQ ? '⚡ พิจารณาอนุมัติ' : '👀 ดูรายละเอียด'}
+                      </button>
+                    </td>
+                  </tr>
+                `;
+              }).join('')}
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    function renderRequisitionsView() {
+      const displayReqs = isCentralHQ()
+        ? appState.reqs
+        : appState.reqs.filter(r => r.br === currentRole);
+
+      const headerAction = isCentralHQ()
+        ? ''
+        : '<button class="btn" onclick="navigateToTab(\'new\')">+ สร้างใบเบิกใหม่</button>';
+
+      return renderSectionHeader(
+        '💌 REQUISITION HUB',
+        isCentralHQ() ? 'ศูนย์รวมใบเบิกจากทุกสาขา' : `ประวัติใบเบิกของ ${BRANCH_NAMES[currentRole]}`,
+        isCentralHQ() ? 'เมื่ออนุมัติ ระบบจะตัดสต็อกคลังกลางและโอนเข้าสาขาปลายทางให้อัตโนมัติ' : 'ตรวจสอบสถานะและผลการอนุมัติแบบเรียลไทม์',
+        headerAction
+      ) + `<div class="card">${renderRequisitionTableRows(displayReqs)}</div>`;
+    }
+
+    function openViewRequisitionModal(reqId) {
+      const targetReq = appState.reqs.find(r => r.id === reqId);
+      if (!targetReq) return;
+
+      const canDecide = isCentralHQ() && targetReq.status === 'wait';
+
+      let modalHtml = `
+        <h2>ใบเบิก #${String(targetReq.id).padStart(4, '0')} ${getStatusBadge(targetReq.status)}</h2>
+        <p style="color: var(--mute); font-weight: 600;">
+          📍 สาขา: ${BRANCH_NAMES[targetReq.br]} · 📅 วันที่: ${formatThaiDate(targetReq.date)}
+          ${targetReq.note ? `<br>💬 บันทึกจากสาขา: "${escapeHtml(targetReq.note)}"` : ''}
+        </p>
+        <div class="wrap">
+          <table class="tbl">
+            <thead>
+              <tr>
+                <th>สินค้า</th>
+                <th class="r-">ขอเบิก</th>
+                ${canDecide ? '<th class="r-">คลังกลางมี</th><th class="r-">อนุมัติจ่ายจริง</th>' : '<th class="r-">ยอดที่ได้จริง</th>'}
+              </tr>
+            </thead>
+            <tbody>
+      `;
+
+      targetReq.items.forEach((item, index) => {
+        const product = findProduct(item.pid);
+        const maxApproved = Math.max(0, Math.min(item.q, product.stock.C));
+
+        modalHtml += `
+          <tr>
+            <td>${product.ico} <b>${product.name}</b></td>
+            <td class="r-">${item.q} ${product.unit}</td>
+            ${canDecide ? `
+              <td class="r- ${product.stock.C < item.q ? 'low' : ''}">
+                ${product.stock.C} ${product.unit}
+              </td>
+              <td class="r-">
+                <input type="number" min="0" max="${maxApproved}" value="${maxApproved}" id="approved-qty-${index}">
+              </td>
+            ` : `
+              <td class="r-" style="font-weight: 800;">
+                ${targetReq.status === 'ok' ? (item.a !== undefined ? item.a : item.q) + ' ' + product.unit : '-'}
+              </td>
+            `}
+          </tr>
+        `;
+      });
+
+      modalHtml += '</tbody></table></div>';
+
+      if (canDecide) {
+        modalHtml += `
+          <div class="row">
+            <button class="btn o" onclick="closeModal()">ปิด</button>
+            <button class="btn d" onclick="processRequisitionDecision(${reqId}, false)">❌ ปัดตก (ไม่อนุมัติ)</button>
+            <button class="btn gold" onclick="processRequisitionDecision(${reqId}, true)">✅ อนุมัติ & ตัดสต็อกเลย!</button>
+          </div>
+        `;
+      } else {
+        modalHtml += `
+          <div class="row">
+            <button class="btn o" onclick="closeModal()">ปิดหน้าต่าง</button>
+          </div>
+        `;
+      }
+
+      showModal(modalHtml);
+    }
+
+    function processRequisitionDecision(reqId, isApproved) {
+      const targetReq = appState.reqs.find(r => r.id === reqId);
+      if (!targetReq) return;
+
+      // กรณีคลังกลางปฏิเสธ/ไม่อนุมัติ
+      if (!isApproved) {
+        targetReq.status = 'no';
+        logActivity(`❌ ไม่อนุมัติใบเบิก #${targetReq.id} ของ ${BRANCH_NAMES[targetReq.br]}`);
+        saveAppState();
+        closeModal();
+        showToast('บันทึกการไม่อนุมัติใบเบิกเรียบร้อย');
+        renderApp();
+        return;
+      }
+
+      // กรณีอนุมัติ ตรวจสอบจำนวนสินค้าที่คลังกลางมีจริง
+      const approvedQuantities = targetReq.items.map((item, index) => {
+        const inputEl = getEl(`approved-qty-${index}`);
+        const parsed = inputEl ? parseInt(inputEl.value, 10) : 0;
+        return isNaN(parsed) ? 0 : parsed;
+      });
+
+      for (let i = 0; i < approvedQuantities.length; i++) {
+        const product = findProduct(targetReq.items[i].pid);
+        const reqQty = targetReq.items[i].q;
+        const appQty = approvedQuantities[i];
+
+        if (appQty < 0 || appQty > reqQty) {
+          showToast(`⚠️ จำนวนอนุมัติเกินกว่าที่สาขาขอ: ${product.name}`);
+          return;
+        }
+
+        if (appQty > product.stock.C) {
+          showToast(`🚨 สินค้าในคลังกลางไม่เพียงพอจ่าย: ${product.name}`);
+          return;
+        }
+      }
+
+      // ถ้าทุกรายการเป็น 0 ทั้งหมด ให้แนะนำกดปุ่มปัดตกแทน
+      const hasAnyApproval = approvedQuantities.some(qty => qty > 0);
+      if (!hasAnyApproval) {
+        showToast('⚠️ หากต้องการไม่อนุมัติทุกรายการ กรุณากดปุ่ม "ปัดตก (ไม่อนุมัติ)"');
+        return;
+      }
+
+      // ทำการตัดสต็อกคลังกลางและเพิ่มเข้าสาขาปลายทาง
+      targetReq.items.forEach((item, index) => {
+        const product = findProduct(item.pid);
+        const approvedAmount = approvedQuantities[index];
+        item.a = approvedAmount;
+        product.stock.C -= approvedAmount;
+        product.stock[targetReq.br] += approvedAmount;
+      });
+
+      targetReq.status = 'ok';
+      logActivity(`✅ อนุมัติใบเบิก #${targetReq.id} ให้ ${BRANCH_NAMES[targetReq.br]} (ระบบตัดสต็อกอัตโนมัติแล้ว)`);
+      saveAppState();
+      closeModal();
+      triggerConfetti();
+      showToast('🎉 อนุมัติสำเร็จ! ตัดสต็อกคลังกลางและโอนเข้าสาขาเรียบร้อย');
+      renderApp();
+    }
+
+    // ---------------------------------------------------
+    // 6.12 ไทม์ไลน์ประวัติการใช้งาน (Activity Timeline View)
+    // ---------------------------------------------------
+    function renderActivityTimelineView() {
+      const header = renderSectionHeader(
+        '📜 ACTIVITY TIMELINE',
+        'ประวัติความเคลื่อนไหวทั้งหมดในระบบ',
+        'บันทึกครบถ้วน ใครเบิก ใครอนุมัติ ใครเติมสต็อก เช็กย้อนหลังได้โปร่งใส',
+        '<button class="btn o" onclick="openResetDataModal()">🔄 รีเซ็ตข้อมูลกลับค่าเริ่มต้น</button>'
+      );
+
+      let logContent = '';
+      if (!appState.log.length) {
+        logContent = '<div class="empty">✨ ยังไม่มีประวัติใหม่ ลองเริ่มรับของเข้าคลังหรืออนุมัติใบเบิกดูครับ</div>';
+      } else {
+        const rows = appState.log.map(entry => {
+          const dateObj = new Date(entry.t);
+          const formattedTime = dateObj.toLocaleString('th-TH', { dateStyle: 'short', timeStyle: 'short' });
+          return `
+            <tr>
+              <td style="white-space: nowrap; color: var(--mute); font-weight: 600;">
+                ${formattedTime}
+              </td>
+              <td style="font-weight: 600;">
+                ${escapeHtml(entry.m)}
+              </td>
+            </tr>
+          `;
+        }).join('');
+
+        logContent = `<table class="tbl">${rows}</table>`;
+      }
+
+      return header + `<div class="card">${logContent}</div>`;
+    }
+
+    function openResetDataModal() {
+      const modalHtml = `
+        <h2>🔄 รีเซ็ตข้อมูลทั้งหมดกลับเป็นค่าเริ่มต้น?</h2>
+        <p>ข้อมูลสต็อก ใบเบิก และประวัติทั้งหมดจะถูกล้างและกลับเป็นข้อมูลตัวอย่างเริ่มต้น</p>
+        <div class="row">
+          <button class="btn o" onclick="closeModal()">ยกเลิก</button>
+          <button class="btn d" onclick="confirmResetData()">ยืนยันรีเซ็ตข้อมูล</button>
+        </div>
+      `;
+      showModal(modalHtml);
+    }
+
+    function confirmResetData() {
+      appState = JSON.parse(JSON.stringify(SEED_DATA));
+      saveAppState();
+      closeModal();
+      showToast('✨ รีเซ็ตข้อมูลเริ่มต้นเรียบร้อยแล้ว!');
+      renderApp();
+    }
+
+    // ---------------------------------------------------
+    // 6.13 ฟังก์ชันหลักในการวาดหน้าจอ (Main App Render Loop)
+    // ---------------------------------------------------
+    function renderApp() {
+      // 1. วาด Dropdown เลือกบทบาทผู้ใช้งาน (POV Switcher)
+      const roleSelect = getEl('role');
+      if (!roleSelect.options.length) {
+        roleSelect.innerHTML = Object.keys(BRANCH_NAMES).map(key => {
+          const prefix = key === 'C' ? '👑 ' : '🏪 ';
+          const suffix = key === 'C' ? ' [ผู้อนุมัติ]' : '';
+          return `<option value="${key}">${prefix}${BRANCH_NAMES[key]}${suffix}</option>`;
+        }).join('');
+
+        roleSelect.onchange = function() {
+          currentRole = roleSelect.value;
+          currentTab = 'dash';
+          searchQuery = '';
+          categoryFilter = '';
+          filterLowOnly = false;
+          renderApp();
+          showToast(`สลับบทบาทเป็น ${BRANCH_NAMES[currentRole]} เรียบร้อย ✨`);
+        };
+      }
+      roleSelect.value = currentRole;
+
+      // 2. วาดเมนูนำทาง (Sidebar Nav Buttons)
+      const tabList = isCentralHQ() ? NAVIGATION_TABS.C : NAVIGATION_TABS.B;
+      const navEl = getEl('nav');
+      navEl.innerHTML = tabList.map(tab => {
+        const isSelected = currentTab === tab.id;
+        const pendingBadge = (tab.id === 'reqs' && isCentralHQ() && getPendingCount() > 0)
+          ? `<span class="badge">${getPendingCount()} ด่วน!</span>`
+          : '';
+
+        return `
+          <button class="${isSelected ? 'on' : ''}" onclick="navigateToTab('${tab.id}')">
+            <span>${tab.icon}</span>${tab.label}${pendingBadge}
+          </button>
+        `;
+      }).join('');
+
+      // 3. วาดเนื้อหาในหน้าหลักตาม Tab ปัจจุบัน
+      const viewMap = {
+        dash: renderDashboardView,
+        stock: renderStockView,
+        reqs: renderRequisitionsView,
+        all: renderAllStockRadarView,
+        log: renderActivityTimelineView,
+        new: renderNewRequisitionView
+      };
+
+      const renderView = viewMap[currentTab] || renderDashboardView;
+      getEl('main').innerHTML = renderView();
+    }
+
+    // ---------------------------------------------------
+    // 6.14 เริ่มต้นการทำงานของโปรแกรม (Application Entrypoint)
+    // ---------------------------------------------------
+    renderApp();
+  </script>
+</body>
+</html>
